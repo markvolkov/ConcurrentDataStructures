@@ -167,12 +167,17 @@ public class ConcurrentArrayList<T> implements me.mark.concurrent.interfaces.Lis
 
   @Override
   public int size() {
-    return this.size.get();
+    READ_LOCK.lock();
+    try {
+      return this.size.get();
+    } finally {
+      READ_LOCK.unlock();
+    }
   }
 
   @Override
   public boolean isEmpty() {
-    return size.get() <= 0;
+    return this.size() <= 0;
   }
 
   @Override
@@ -225,24 +230,34 @@ public class ConcurrentArrayList<T> implements me.mark.concurrent.interfaces.Lis
 
   @Override
   public boolean checkRange(int index) {
-    if (index >= size.get() || index < 0) {
-      throw new IndexOutOfBoundsException();
+    READ_LOCK.lock();
+    try {
+      if (index >= this.size() || index < 0) {
+        throw new IndexOutOfBoundsException();
+      }
+      return true;
+    } finally {
+      READ_LOCK.unlock();
     }
-    return true;
   }
 
   private boolean internalRangeCheck(int index) {
-    if (index >= size.get() || index < 0) {
-      return false;
+    READ_LOCK.lock();
+    try {
+      if (index >= size() || index < 0) {
+        return false;
+      }
+      return true;
+    } finally {
+      READ_LOCK.unlock();
     }
-    return true;
   }
 
   @Override
-  public synchronized void ensureCapacity() {
+  public void ensureCapacity() {
     READ_LOCK.lock();
     try {
-      if (size.get() >= this.capacity.get() - 1) {
+      if (size() >= this.capacity.get() - 1) {
         resizeArray();
       }
     } finally {
