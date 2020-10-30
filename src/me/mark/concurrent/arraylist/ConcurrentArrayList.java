@@ -54,13 +54,22 @@ public class ConcurrentArrayList<T> implements me.mark.concurrent.interfaces.Lis
     WRITE_LOCK.lock();
     try {
       if (o == null) {
-        return false;
+        for (int i = 0; i < this.size(); i++) {
+          if (get(i) == null) {
+            System.arraycopy(this.objects, i + 1, this.objects, i,this.size() - i - 1);
+            size.decrementAndGet();
+            break;
+          }
+        }
+      } else {
+        for (int i = 0; i < this.size(); i++) {
+          if (Objects.equals(get(i), o)) {
+            System.arraycopy(this.objects, i + 1, this.objects, i,this.size() - i - 1);
+            size.decrementAndGet();
+            break;
+          }
+        }
       }
-      if (!contains(o)) {
-        return false;
-      }
-      int index = lastIndexOf(o);
-      remove(index);
     } finally {
       WRITE_LOCK.unlock();
     }
@@ -103,7 +112,7 @@ public class ConcurrentArrayList<T> implements me.mark.concurrent.interfaces.Lis
       Object temp = get(index);
       set(index, element);
       for (int i = index + 1; i < size.get(); i++) {
-        Object current = this.objects[i];
+        Object current = get(i);
         this.objects[i] = temp;
         temp = current;
       }
@@ -122,7 +131,9 @@ public class ConcurrentArrayList<T> implements me.mark.concurrent.interfaces.Lis
     try {
       temp = (T) this.objects[index];
       this.objects[index] = null;
-      IntStream.range(index, size.get() - 1).forEach(i -> this.objects[i] = this.objects[i + 1]);
+      if (this.size() - index - 1 > 0) {
+        System.arraycopy(this.objects, index + 1, this.objects, index,this.size() - index - 1);
+      }
       size.decrementAndGet();
     } finally {
       WRITE_LOCK.unlock();
