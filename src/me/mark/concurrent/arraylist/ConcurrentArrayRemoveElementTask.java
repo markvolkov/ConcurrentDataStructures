@@ -13,7 +13,11 @@ public class ConcurrentArrayRemoveElementTask implements Runnable {
     @Override
     public void run() {
         ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
-        list.remove(threadLocalRandom.nextInt(list.size()));
+        try {
+            list.remove(threadLocalRandom.nextInt(list.size()));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
 }

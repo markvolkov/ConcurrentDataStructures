@@ -10,13 +10,13 @@ public interface List<T> extends Iterable<T> {
 
   boolean remove(Object o);
 
-  T get(int index);
+  T get(int index) throws IllegalAccessException;
 
-  T set(int index, T element);
+  T set(int index, T element) throws IllegalAccessException;
 
   void add(int index, T element);
 
-  T remove(int index);
+  T remove(int index) throws IllegalAccessException;
 
   int indexOf(Object o);
 
@@ -30,7 +30,7 @@ public interface List<T> extends Iterable<T> {
 
   void clear();
 
-  Object[] toArray();
+  Object[] toArray() throws IllegalAccessException;
 
   Iterator<T> iterator();
 

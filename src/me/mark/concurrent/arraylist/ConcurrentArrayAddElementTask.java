@@ -12,8 +12,8 @@ public final class ConcurrentArrayAddElementTask implements Runnable {
 
     @Override
     public void run() {
-        ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
-        list.add(threadLocalRandom.nextInt());
+//        ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
+        list.add(list.size());
     }
 
 }
